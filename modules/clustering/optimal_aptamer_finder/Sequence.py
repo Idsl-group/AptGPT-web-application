@@ -988,8 +988,8 @@ def generate_all_recommendations(binding_targets, rnds, train_percent):
             # ax.legend()
             # plt.savefig(str(os.getcwd()) + f"/results/{TIME}/recommendations/rec_{binding_target}_{rnd}_hist.png")
             # plt.close()
-            # return seq_cluster
-            return data
+            return seq_cluster, data
+            # return data
 
 
 # def main(binding_targets=['theophylline']):

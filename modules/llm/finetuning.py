@@ -12,7 +12,7 @@ from .tokenizer import AptamerTokenizer
 from transformers import GPT2LMHeadModel, AdamW
 from torch.utils.data import DataLoader
 from skbio.alignment import local_pairwise_align_ssw
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = 'cpu' #torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class SFT_AptGPT:
     """
@@ -164,13 +164,21 @@ class SFT_AptGPT:
 
     @staticmethod
     def compute_alignment_score(seq, targets):
-        alignment_scores = []
-        for target in targets:
-            _, score, _ = local_pairwise_align_ssw(DNA(seq), DNA(target))
-            max_possible_score = len(seq) + len(target)
+        total = len(targets)
+        clusters = targets.cluster_id.unique()
+        scores = []
+
+        for cluster in clusters:
+            group = targets[targets.cluster_id == cluster]
+            factor = len(group) / total
+            seq_target = group.sequence.iloc[0]
+
+            _, score, _ = local_pairwise_align_ssw(DNA(seq), DNA(seq_target))
+            max_possible_score = len(seq) + len(seq_target)
             normalized_score = score / max_possible_score
-            alignment_scores.append(normalized_score)
-        return alignment_scores
+            scores.append(factor * normalized_score)
+
+        return scores
 
 
 # ---------------------------------------------------------------------------------------------------------------------#

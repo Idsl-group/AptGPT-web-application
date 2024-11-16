@@ -38,7 +38,19 @@ def optimal_aptamer_finder_clustering(binding_target, rounds, data, threshold, f
         pickle.dump(sequencelib, f)
         f.close()
     get_priority_clusters(alignment_threshold=threshold, primers=(forward_primer, reverse_primer))
-    clustered_data = generate_all_recommendations([binding_target], [str(rounds)], 1.0)
+    _, clustered_data = generate_all_recommendations([binding_target], [str(rounds)], 1.0)
     clustered_data = pd.DataFrame(clustered_data, columns=['Index', 'Sequences', 'Secondary structure', 'Scores', 'Split'])
 
     return clustered_data.head(20)
+
+
+def get_clusters(binding_target, rounds, data, threshold, forward_primer, reverse_primer):
+    sequencelib = SequenceLibrary(with_primers=False, primers=(forward_primer, reverse_primer))
+    sequencelib.add_data(str(binding_target), str(rounds), data.sequence.values, structure_mode='from_ct', top_k=None)
+    with open(f'./results/{TIME}/sequencelib.pickle', 'wb') as f:
+        pickle.dump(sequencelib, f)
+        f.close()
+    get_priority_clusters(alignment_threshold=threshold, primers=(forward_primer, reverse_primer))
+    clustered_sequences, _ = generate_all_recommendations([binding_target], [str(rounds)], 1.0)
+
+    return clustered_sequences
