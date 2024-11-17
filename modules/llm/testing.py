@@ -14,10 +14,24 @@ def test_sequences(data):
     top_20_sequences['key'] = 0
     final_data = pd.merge(top_20_sequences, data, how='outer', on='key', suffixes=('_org', '_gen')).drop(columns='key')
     print(final_data)
-    final_data['alignment_score'] = final_data[['Sequences', 'Aptamers']].apply(
+    final_data['Alignment Scores'] = final_data[['Sequences', 'Aptamers']].apply(
         lambda x: check_alignment(x['Sequences'], x['Aptamers']), axis=1)
-    final_data.sort_values(by=['alignment_score'], ascending=False, inplace=True)
+    final_data.sort_values(by=['Alignment Scores'], ascending=False, inplace=True)
     final_data.drop_duplicates(subset=['Aptamers'], inplace=True)
-    final_data['alignment_score'] = final_data['alignment_score'].apply(lambda x: str(round(x * 100, 2)) + "%")
+    final_data['Alignment Scores'] = final_data['Alignment Scores'].apply(lambda x: str(round(x * 100, 2)) + "%")
     
-    return final_data[['Aptamers', 'alignment_score']].reset_index(drop=True)
+    return final_data[['Aptamers', 'Alignment Scores']].reset_index(drop=True)
+
+def compare_sequences(data, target):
+    data['key'] = 0
+    target['key'] = 0
+    final_data = pd.merge(target, data, how='outer', on='key', suffixes=('_org', '_gen')).drop(columns='key')
+    print(final_data)
+    final_data['Alignment Scores'] = final_data[['Sequences_org', 'Sequences_gen']].apply(
+        lambda x: check_alignment(x['Sequences_org'], x['Sequences_gen']), axis=1)
+    final_data.sort_values(by=['Alignment Scores'], ascending=False, inplace=True)
+    final_data.drop_duplicates(subset=['Sequences_gen'], inplace=True)
+    final_data['Alignment Scores'] = final_data['Alignment Scores'].apply(lambda x: str(round(x * 100, 2)) + "%")
+    final_data.rename(columns={'Sequences_gen': 'Aptamers'}, inplace=True)
+    
+    return final_data[['Aptamers', 'Alignment Scores']].reset_index(drop=True).head(20)

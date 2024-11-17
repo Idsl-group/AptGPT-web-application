@@ -51,6 +51,9 @@ class Aptamer():
         self.forward_stems = None # stems to the left of the loop
         self.backward_stems = None # stems to the right of the loop
         self.score = 0 # store final score given to the aptamer
+        self.popularity_score = 0
+        self.stability_score = 0
+        self.motif_score = 0
         #self.alignments = {} # Not used ?
         #self.clusters = {} # Not used ?
 
@@ -800,6 +803,9 @@ class SequenceLibrary():
             motif_scores = [ks, cks, (fss+bss)/2, ls]
             final_score = sum(popularity_scores)/len(popularity_scores) + sum(stability_scores)/len(stability_scores) + sum(motif_scores)/len(motif_scores)
             self.sequences[sequences[s].seqid].score = final_score
+            self.sequences[sequences[s].seqid].popularity_score = sum(popularity_scores)/len(popularity_scores)
+            self.sequences[sequences[s].seqid].stability_score = sum(stability_scores)/len(stability_scores)
+            self.sequences[sequences[s].seqid].motif_score = sum(motif_scores)/len(motif_scores)
             # Print top 10 sequences in cluster
             if s < 10:
                 print(f'seq{str(s):2}| {sequences[s].seqid} | {out}   |||   {tcs:.2f} // {sc:.2f} // {dg:.2f} // {ks:.2f}  // {cks:.2f} // {fss:.2f}  // {bss:.2f} // // {ls:.2f}  --> {final_score:.2f}')
@@ -962,10 +968,13 @@ def generate_all_recommendations(binding_targets, rnds, train_percent):
                     idx = str(-1)
                 sequence = sequencelib.sequences[seqid].sequence
                 final_score = sequencelib.sequences[seqid].score
+                popularity_score = sequencelib.sequences[seqid].popularity_score
+                stability_score = sequencelib.sequences[seqid].stability_score
+                motif_score = sequencelib.sequences[seqid].motif_score
                 ct = sequencelib.sequences[seqid].ct
                 # rounds = sequencelib.sequences[seqid].rounds[binding_target]
                 label = "test" if random.random() > train_percent else "train"
-                data.append([idx, sequence, ct, final_score, label])
+                data.append([idx, sequence, ct, final_score, popularity_score, stability_score, motif_score, label])
                 # print(f"seq{i} ({idx:>4s})| {seqids[i]} | {sequence} | {ct} | {final_score}  --> {rounds}")
                 # f.write(f"seq{i} ({idx:>4s})| {seqids[i]} | {sequence} | {ct} | {final_score}  --> {rounds} \n")
             # f.close()

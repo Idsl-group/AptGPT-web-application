@@ -3,8 +3,8 @@ import datetime
 import pandas as pd
 from transformers import GPT2Config, GPT2LMHeadModel, Trainer, TrainingArguments
 from transformers import DataCollatorForLanguageModeling
-from tokenizer import AptamerTokenizer
-from data import AptamerDataset
+from .tokenizer import AptamerTokenizer
+from .data import AptamerDataset
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class AptGPT:
@@ -70,20 +70,20 @@ class AptGPT:
 # ----------------------------------------------------------------------------------------------------------------------#
 # Usage
 # Instantiate the AptGPT class
-tokenizer = AptamerTokenizer().load_tokenizer()
-apt_gpt = AptGPT(max_positions=30,
-                 embedding_size=256,
-                 num_layers=16,
-                 num_heads=16,
-                 batch_size_per_device=32,
-                 epochs=200,
-                 output_directory="/home/rtulluri/AptGPT-web-application/model",
-                 tokenizer=tokenizer)
-# Read data set
-dataset = pd.read_csv('/home/rtulluri/DAPTEV_Model/data/start/guan05_vae_trainer_augmented.csv', index_col=0)
-dataset = dataset['Sequences'].tolist()
-# Tokenize dataset and convert to AptamerDataset
-tokenized_dataset = tokenizer(dataset, padding='max_length', truncation=True, max_length=30, return_tensors='pt')
-train_dataset = AptamerDataset(tokenized_dataset)
-# Train the model
-apt_gpt.train(train_dataset)
+# tokenizer = AptamerTokenizer().load_tokenizer()
+# apt_gpt = AptGPT(max_positions=30,
+#                  embedding_size=256,
+#                  num_layers=16,
+#                  num_heads=16,
+#                  batch_size_per_device=32,
+#                  epochs=200,
+#                  output_directory="/home/rtulluri/AptGPT-web-application/model",
+#                  tokenizer=tokenizer)
+# # Read data set
+# dataset = pd.read_csv('/home/rtulluri/DAPTEV_Model/data/start/guan05_vae_trainer_augmented.csv', index_col=0)
+# dataset = dataset['Sequences'].tolist()
+# # Tokenize dataset and convert to AptamerDataset
+# tokenized_dataset = tokenizer(dataset, padding='max_length', truncation=True, max_length=30, return_tensors='pt')
+# train_dataset = AptamerDataset(tokenized_dataset)
+# # Train the model
+# apt_gpt.train(train_dataset)
