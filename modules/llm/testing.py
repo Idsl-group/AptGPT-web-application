@@ -13,7 +13,6 @@ def test_sequences(data):
     data['key'] = 0
     top_20_sequences['key'] = 0
     final_data = pd.merge(top_20_sequences, data, how='outer', on='key', suffixes=('_org', '_gen')).drop(columns='key')
-    print(final_data)
     final_data['Alignment Scores'] = final_data[['Sequences', 'Aptamers']].apply(
         lambda x: check_alignment(x['Sequences'], x['Aptamers']), axis=1)
     final_data.sort_values(by=['Alignment Scores'], ascending=False, inplace=True)
@@ -26,7 +25,7 @@ def compare_sequences(data, target):
     data['key'] = 0
     target['key'] = 0
     final_data = pd.merge(target, data, how='outer', on='key', suffixes=('_org', '_gen')).drop(columns='key')
-    print(final_data)
+    print(final_data.columns)
     final_data['Alignment Scores'] = final_data[['Sequences_org', 'Sequences_gen']].apply(
         lambda x: check_alignment(x['Sequences_org'], x['Sequences_gen']), axis=1)
     final_data.sort_values(by=['Alignment Scores'], ascending=False, inplace=True)

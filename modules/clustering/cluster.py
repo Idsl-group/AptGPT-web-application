@@ -3,7 +3,7 @@ from Bio import SeqIO
 from arnie.mfe import mfe
 from .optimal_aptamer_finder.Sequence import *
 
-def read_fastq(fastq_file):
+def read_fastq(fastq_file, sc_flag=True):
     data = []
     fastq_file.seek(0)
     
@@ -13,20 +13,26 @@ def read_fastq(fastq_file):
         seq_id = record.id
         sequence = str(record.seq)[18:48]
 
-        try:
-            structure = mfe(sequence)
-        except Exception as e:
-            print(f"Error computing MFE for sequence {seq_id}: {e}")
-            structure = None
+        if sc_flag:
+            try:
+                structure = mfe(sequence)
+            except Exception as e:
+                print(f"Error computing MFE for sequence {seq_id}: {e}")
+                structure = None
 
-        # Append the results to the list
-        data.append({
-            'sequence_id': seq_id,
-            'sequence': sequence,
-            'mfe_structure': structure
-        })
+            # Append the results to the list
+            data.append({
+                'sequence_id': seq_id,
+                'sequence': sequence,
+                'mfe_structure': structure
+            })
+        else:
+            data.append({
+                'sequence_id': seq_id,
+                'sequence': sequence
+            })
 
-    df = pd.DataFrame(data, columns=['sequence_id', 'sequence', 'mfe_structure'])
+    df = pd.DataFrame(data, columns=list(data[0].keys()))
 
     return df
 
@@ -39,7 +45,7 @@ def optimal_aptamer_finder_clustering(binding_target, rounds, data, threshold, f
         f.close()
     get_priority_clusters(alignment_threshold=threshold, primers=(forward_primer, reverse_primer))
     _, clustered_data = generate_all_recommendations([binding_target], [str(rounds)], 1.0)
-    clustered_data = pd.DataFrame(clustered_data, columns=['Index', 'Sequences', 'Secondary structure', 'Scores', 'Popularity Scores', 'Stability Scores', 'Motif Scores', 'Split'])
+    clustered_data = pd.DataFrame(clustered_data, columns=['Index', 'Aptamers', 'Secondary Structure', 'Scores', 'Popularity Scores', 'Stability Scores', 'Motif Scores', 'Split'])
     cmd = "rm temp_ct.txt"
     subprocess.call([cmd], shell=True)
     cmd = "rm temp_seqs.txt"

@@ -1,47 +1,29 @@
+import os
 import streamlit as st
-from st_aggrid import AgGrid, GridOptionsBuilder, JsCode, GridUpdateMode
 
-cell_button_renderer = JsCode("""
-class BtnCellRenderer {
-    init(params) {
-        this.params = params;
-        this.eGui = document.createElement('button');
-        this.eGui.innerText = 'View';
-        this.eGui.classList.add('btn', 'btn-primary');
-        this.eGui.style.width = '70px';
-        this.eGui.style.height = '30px';
-        this.eGui.addEventListener('click', () => {
-            params.api.deselectAll();
-            params.api.selectNode(params.node, true, true);
-        });
-    }
-    getGui() {
-        return this.eGui;
-    }
-}
-""")
+def render_image_grid(data):
+    # Show images in grid
+    st.subheader('Secondary Structure images for sequences')
+    num_images = len(data)
+    num_cols = 4
+    num_rows = (num_images + num_cols - 1) // num_cols
 
-def view_table(df):
-    df['View Structure'] = ''
-    gb = GridOptionsBuilder.from_dataframe(df)
-    gb.configure_selection('single', use_checkbox=False)
+    images = data['Image Paths'].tolist()
+    captions = data['Aptamers'].tolist()
 
-    for col in df.columns:
-        if col == 'View Structure':
-            gb.configure_column(col, header_name='', suppressSizeToFit=True, cellRenderer='BtnCellRenderer')
+    for row in range(num_rows):
+        cols = st.columns(num_cols)
+        for col in range(num_cols):
+            idx = row * num_cols + col
+            if idx < num_images:
+                with cols[col]:
+                    st.image(images[idx], caption=f"Sequence: {captions[idx]}")
+            else:
+                cols[col].empty()
 
-        gb.configure_column(col, type='rightAligned', editable=False)
-
-    grid_options = gb.build()
-    grid_options['components'] = {
-        'BtnCellRenderer': cell_button_renderer.js_code
-    }
-    grid_options['rowHeight'] = 40
-
-    grid_response = AgGrid(df, gridOptions=grid_options, update_mode=GridUpdateMode.MODEL_CHANGED, width='100%', fit_columns_on_grid_load=True, allow_unsafe_jscode=True)
-
-    if grid_response['selected_rows']:
-        selected = grid_response['selected_rows'][0]
-        st.toast('Selected')
-        with st.modal("Secondary Structure"):
-            st.write(selected)
+    # Delete the images to keep directory clean
+    image_files = os.listdir(f'{os.path.abspath(os.getcwd())}/images/')
+    for file in image_files:
+        if file.startswith('__init__') or file.startswith('.ipynb'):
+            continue
+        os.remove(f'{os.path.abspath(os.getcwd())}/images/{file}')
