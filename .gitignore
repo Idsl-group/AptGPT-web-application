@@ -165,3 +165,7 @@ cython_debug/
 model/
 results/
 images/
+log/
+
+# project files
+*.log
