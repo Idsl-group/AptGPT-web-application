@@ -1,0 +1,8 @@
+# Vienna RNAfold 2 Linux build from source:
+vienna_2: /home/rtulluri/Downloads/ViennaRNA-2.6.4/src/bin
+vienna: /home/rtulluri/Downloads/ViennaRNA-2.6.4/src/bin
+
+#directory to write temp files
+TMP: /tmp
+
+

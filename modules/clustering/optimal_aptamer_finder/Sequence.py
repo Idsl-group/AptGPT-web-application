@@ -20,7 +20,7 @@ from termcolor import colored
 #from src.nc2hp import
 import datetime
 
-max_align = 40
+max_align = 20
 # Initialize time that will be used to label this experiment
 TIME = str(datetime.datetime.now())
 # Create directory for results

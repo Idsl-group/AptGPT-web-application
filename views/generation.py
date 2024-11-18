@@ -50,4 +50,5 @@ def render_generation_page():
             st.dataframe(final_generated_sequences[['Aptamers', 'Secondary Structure', 'Alignment Scores']], use_container_width=True)
             
             logging.info('Rendering image grid')
-            render_image_grid(final_generated_sequences)
+            st.subheader('Secondary Structure images for sequences')
+            render_image_grid(final_generated_sequences, num_cols=4)
